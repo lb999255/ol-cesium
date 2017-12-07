@@ -69,6 +69,7 @@ goog.require('ol.format.filter.And');
 goog.require('ol.format.filter.Bbox');
 goog.require('ol.format.filter.Comparison');
 goog.require('ol.format.filter.ComparisonBinary');
+goog.require('ol.format.filter.Contains');
 goog.require('ol.format.filter.During');
 goog.require('ol.format.filter.EqualTo');
 goog.require('ol.format.filter.Filter');
@@ -174,10 +175,12 @@ goog.require('ol.source.VectorTile');
 goog.require('ol.source.WMTS');
 goog.require('ol.source.XYZ');
 goog.require('ol.source.Zoomify');
+goog.require('ol.style');
 goog.require('ol.style.AtlasManager');
 goog.require('ol.style.Circle');
 goog.require('ol.style.Fill');
 goog.require('ol.style.Icon');
+goog.require('ol.style.IconImageCache');
 goog.require('ol.style.Image');
 goog.require('ol.style.RegularShape');
 goog.require('ol.style.Stroke');
@@ -193,7 +196,9 @@ goog.require('olcs.AutoRenderLoop');
 goog.require('olcs.Camera');
 goog.require('olcs.FeatureConverter');
 goog.require('olcs.OLCesium');
+goog.require('olcs.OverlaySynchronizer');
 goog.require('olcs.RasterSynchronizer');
+goog.require('olcs.SynchronizedOverlay');
 goog.require('olcs.VectorSynchronizer');
 goog.require('olcs.contrib.LazyLoader');
 goog.require('olcs.contrib.Manager');
@@ -1125,6 +1130,10 @@ goog.exportSymbol(
     'ol.Sphere.getArea',
     ol.Sphere.getArea);
 
+goog.exportSymbol(
+    'ol.style.iconImageCache',
+    ol.style.iconImageCache);
+
 goog.exportProperty(
     ol.Tile.prototype,
     'getTileCoord',
@@ -1138,6 +1147,11 @@ goog.exportProperty(
 goog.exportSymbol(
     'ol.tilegrid.createXYZ',
     ol.tilegrid.createXYZ);
+
+goog.exportProperty(
+    ol.VectorTile.prototype,
+    'getExtent',
+    ol.VectorTile.prototype.getExtent);
 
 goog.exportProperty(
     ol.VectorTile.prototype,
@@ -1499,6 +1513,11 @@ goog.exportProperty(
     'load',
     ol.style.Icon.prototype.load);
 
+goog.exportProperty(
+    ol.style.IconImageCache.prototype,
+    'setSize',
+    ol.style.IconImageCache.prototype.setSize);
+
 goog.exportSymbol(
     'ol.style.Image',
     ol.style.Image);
@@ -1776,8 +1795,8 @@ goog.exportProperty(
 
 goog.exportProperty(
     ol.style.Text.prototype,
-    'getExceedLength',
-    ol.style.Text.prototype.getExceedLength);
+    'getOverflow',
+    ol.style.Text.prototype.getOverflow);
 
 goog.exportProperty(
     ol.style.Text.prototype,
@@ -1846,8 +1865,23 @@ goog.exportProperty(
 
 goog.exportProperty(
     ol.style.Text.prototype,
-    'setExceedLength',
-    ol.style.Text.prototype.setExceedLength);
+    'getBackgroundFill',
+    ol.style.Text.prototype.getBackgroundFill);
+
+goog.exportProperty(
+    ol.style.Text.prototype,
+    'getBackgroundStroke',
+    ol.style.Text.prototype.getBackgroundStroke);
+
+goog.exportProperty(
+    ol.style.Text.prototype,
+    'getPadding',
+    ol.style.Text.prototype.getPadding);
+
+goog.exportProperty(
+    ol.style.Text.prototype,
+    'setOverflow',
+    ol.style.Text.prototype.setOverflow);
 
 goog.exportProperty(
     ol.style.Text.prototype,
@@ -1908,6 +1942,21 @@ goog.exportProperty(
     ol.style.Text.prototype,
     'setTextBaseline',
     ol.style.Text.prototype.setTextBaseline);
+
+goog.exportProperty(
+    ol.style.Text.prototype,
+    'setBackgroundFill',
+    ol.style.Text.prototype.setBackgroundFill);
+
+goog.exportProperty(
+    ol.style.Text.prototype,
+    'setBackgroundStroke',
+    ol.style.Text.prototype.setBackgroundStroke);
+
+goog.exportProperty(
+    ol.style.Text.prototype,
+    'setPadding',
+    ol.style.Text.prototype.setPadding);
 
 goog.exportSymbol(
     'ol.source.BingMaps',
@@ -2377,6 +2426,11 @@ goog.exportProperty(
 
 goog.exportProperty(
     ol.source.Vector.prototype,
+    'removeLoadedExtent',
+    ol.source.Vector.prototype.removeLoadedExtent);
+
+goog.exportProperty(
+    ol.source.Vector.prototype,
     'removeFeature',
     ol.source.Vector.prototype.removeFeature);
 
@@ -2612,6 +2666,11 @@ goog.exportProperty(
     ol.proj.Projection.prototype,
     'getWorldExtent',
     ol.proj.Projection.prototype.getWorldExtent);
+
+goog.exportProperty(
+    ol.proj.Projection.prototype,
+    'getAxisOrientation',
+    ol.proj.Projection.prototype.getAxisOrientation);
 
 goog.exportProperty(
     ol.proj.Projection.prototype,
@@ -3739,6 +3798,10 @@ goog.exportSymbol(
     ol.format.filter.bbox);
 
 goog.exportSymbol(
+    'ol.format.filter.contains',
+    ol.format.filter.contains);
+
+goog.exportSymbol(
     'ol.format.filter.intersects',
     ol.format.filter.intersects);
 
@@ -4190,6 +4253,10 @@ goog.exportSymbol(
 goog.exportSymbol(
     'ol.format.filter.ComparisonBinary',
     ol.format.filter.ComparisonBinary);
+
+goog.exportSymbol(
+    'ol.format.filter.Contains',
+    ol.format.filter.Contains);
 
 goog.exportSymbol(
     'ol.format.filter.During',
@@ -4681,6 +4748,18 @@ goog.exportSymbol(
     olcs.core.convertUrlToCesium);
 
 goog.exportSymbol(
+    'olcs.core.resetToNorthZenith',
+    olcs.core.resetToNorthZenith);
+
+goog.exportSymbol(
+    'olcs.core.rotateAroundBottomCenter',
+    olcs.core.rotateAroundBottomCenter);
+
+goog.exportSymbol(
+    'olcs.core.normalizeView',
+    olcs.core.normalizeView);
+
+goog.exportSymbol(
     'olcs.FeatureConverter',
     olcs.FeatureConverter);
 
@@ -4765,6 +4844,11 @@ goog.exportProperty(
 
 goog.exportProperty(
     olcs.OLCesium.prototype,
+    'getOlView',
+    olcs.OLCesium.prototype.getOlView);
+
+goog.exportProperty(
+    olcs.OLCesium.prototype,
     'getCesiumScene',
     olcs.OLCesium.prototype.getCesiumScene);
 
@@ -4819,8 +4903,46 @@ goog.exportProperty(
     olcs.OLCesium.prototype.setTargetFrameRate);
 
 goog.exportSymbol(
+    'olcs.OverlaySynchronizer',
+    olcs.OverlaySynchronizer);
+
+goog.exportProperty(
+    olcs.OverlaySynchronizer.prototype,
+    'synchronize',
+    olcs.OverlaySynchronizer.prototype.synchronize);
+
+goog.exportProperty(
+    olcs.OverlaySynchronizer.prototype,
+    'addOverlays',
+    olcs.OverlaySynchronizer.prototype.addOverlays);
+
+goog.exportProperty(
+    olcs.OverlaySynchronizer.prototype,
+    'addOverlay',
+    olcs.OverlaySynchronizer.prototype.addOverlay);
+
+goog.exportProperty(
+    olcs.OverlaySynchronizer.prototype,
+    'removeOverlay',
+    olcs.OverlaySynchronizer.prototype.removeOverlay);
+
+goog.exportSymbol(
     'olcs.RasterSynchronizer',
     olcs.RasterSynchronizer);
+
+goog.exportSymbol(
+    'olcs.SynchronizedOverlay',
+    olcs.SynchronizedOverlay);
+
+goog.exportProperty(
+    olcs.SynchronizedOverlay.prototype,
+    'getScene',
+    olcs.SynchronizedOverlay.prototype.getScene);
+
+goog.exportProperty(
+    olcs.SynchronizedOverlay.prototype,
+    'destroy',
+    olcs.SynchronizedOverlay.prototype.destroy);
 
 goog.exportSymbol(
     'olcs.VectorSynchronizer',
@@ -4838,16 +4960,6 @@ goog.exportProperty(
 goog.exportSymbol(
     'olcs.contrib.Manager',
     olcs.contrib.Manager);
-
-goog.exportProperty(
-    olcs.contrib.Manager.prototype,
-    'toggle3D',
-    olcs.contrib.Manager.prototype.toggle3D);
-
-goog.exportProperty(
-    olcs.contrib.Manager.prototype,
-    'is3dEnabled',
-    olcs.contrib.Manager.prototype.is3dEnabled);
 
 goog.exportProperty(
     ol.Object.prototype,
@@ -7098,6 +7210,11 @@ goog.exportProperty(
     ol.source.Cluster.prototype,
     'getUrl',
     ol.source.Cluster.prototype.getUrl);
+
+goog.exportProperty(
+    ol.source.Cluster.prototype,
+    'removeLoadedExtent',
+    ol.source.Cluster.prototype.removeLoadedExtent);
 
 goog.exportProperty(
     ol.source.Cluster.prototype,
@@ -14168,3 +14285,118 @@ goog.exportProperty(
     ol.control.ZoomToExtent.prototype,
     'un',
     ol.control.ZoomToExtent.prototype.un);
+
+goog.exportProperty(
+    olcs.SynchronizedOverlay.prototype,
+    'getElement',
+    olcs.SynchronizedOverlay.prototype.getElement);
+
+goog.exportProperty(
+    olcs.SynchronizedOverlay.prototype,
+    'getId',
+    olcs.SynchronizedOverlay.prototype.getId);
+
+goog.exportProperty(
+    olcs.SynchronizedOverlay.prototype,
+    'getMap',
+    olcs.SynchronizedOverlay.prototype.getMap);
+
+goog.exportProperty(
+    olcs.SynchronizedOverlay.prototype,
+    'getOffset',
+    olcs.SynchronizedOverlay.prototype.getOffset);
+
+goog.exportProperty(
+    olcs.SynchronizedOverlay.prototype,
+    'getPosition',
+    olcs.SynchronizedOverlay.prototype.getPosition);
+
+goog.exportProperty(
+    olcs.SynchronizedOverlay.prototype,
+    'getPositioning',
+    olcs.SynchronizedOverlay.prototype.getPositioning);
+
+goog.exportProperty(
+    olcs.SynchronizedOverlay.prototype,
+    'setElement',
+    olcs.SynchronizedOverlay.prototype.setElement);
+
+goog.exportProperty(
+    olcs.SynchronizedOverlay.prototype,
+    'setMap',
+    olcs.SynchronizedOverlay.prototype.setMap);
+
+goog.exportProperty(
+    olcs.SynchronizedOverlay.prototype,
+    'setOffset',
+    olcs.SynchronizedOverlay.prototype.setOffset);
+
+goog.exportProperty(
+    olcs.SynchronizedOverlay.prototype,
+    'setPosition',
+    olcs.SynchronizedOverlay.prototype.setPosition);
+
+goog.exportProperty(
+    olcs.SynchronizedOverlay.prototype,
+    'setPositioning',
+    olcs.SynchronizedOverlay.prototype.setPositioning);
+
+goog.exportProperty(
+    olcs.SynchronizedOverlay.prototype,
+    'get',
+    olcs.SynchronizedOverlay.prototype.get);
+
+goog.exportProperty(
+    olcs.SynchronizedOverlay.prototype,
+    'getKeys',
+    olcs.SynchronizedOverlay.prototype.getKeys);
+
+goog.exportProperty(
+    olcs.SynchronizedOverlay.prototype,
+    'getProperties',
+    olcs.SynchronizedOverlay.prototype.getProperties);
+
+goog.exportProperty(
+    olcs.SynchronizedOverlay.prototype,
+    'set',
+    olcs.SynchronizedOverlay.prototype.set);
+
+goog.exportProperty(
+    olcs.SynchronizedOverlay.prototype,
+    'setProperties',
+    olcs.SynchronizedOverlay.prototype.setProperties);
+
+goog.exportProperty(
+    olcs.SynchronizedOverlay.prototype,
+    'unset',
+    olcs.SynchronizedOverlay.prototype.unset);
+
+goog.exportProperty(
+    olcs.SynchronizedOverlay.prototype,
+    'changed',
+    olcs.SynchronizedOverlay.prototype.changed);
+
+goog.exportProperty(
+    olcs.SynchronizedOverlay.prototype,
+    'dispatchEvent',
+    olcs.SynchronizedOverlay.prototype.dispatchEvent);
+
+goog.exportProperty(
+    olcs.SynchronizedOverlay.prototype,
+    'getRevision',
+    olcs.SynchronizedOverlay.prototype.getRevision);
+
+goog.exportProperty(
+    olcs.SynchronizedOverlay.prototype,
+    'on',
+    olcs.SynchronizedOverlay.prototype.on);
+
+goog.exportProperty(
+    olcs.SynchronizedOverlay.prototype,
+    'once',
+    olcs.SynchronizedOverlay.prototype.once);
+
+goog.exportProperty(
+    olcs.SynchronizedOverlay.prototype,
+    'un',
+    olcs.SynchronizedOverlay.prototype.un);

@@ -286,6 +286,10 @@
                     <a href="olcs.OLCesium.html#getOlMap">getOlMap</a>
                 </li>
             
+                <li data-name="olcs.OLCesium#getOlView" class="unstable">
+                    <a href="olcs.OLCesium.html#getOlView">getOlView</a>
+                </li>
+            
                 <li data-name="olcs.OLCesium#setBlockCesiumRendering" class="unstable">
                     <a href="olcs.OLCesium.html#setBlockCesiumRendering">setBlockCesiumRendering</a>
                 </li>
@@ -312,6 +316,43 @@
             </ul>
         </li>
     
+        <li class="item" data-name="olcs.OverlaySynchronizer">
+            <span class="title">
+                <a href="olcs.OverlaySynchronizer.html">olcs.OverlaySynchronizer</a>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="olcs.OverlaySynchronizer#addOverlay" class="unstable">
+                    <a href="olcs.OverlaySynchronizer.html#addOverlay">addOverlay</a>
+                </li>
+            
+                <li data-name="olcs.OverlaySynchronizer#addOverlays" class="unstable">
+                    <a href="olcs.OverlaySynchronizer.html#addOverlays">addOverlays</a>
+                </li>
+            
+                <li data-name="olcs.OverlaySynchronizer#removeOverlay" class="unstable">
+                    <a href="olcs.OverlaySynchronizer.html#removeOverlay">removeOverlay</a>
+                </li>
+            
+                <li data-name="olcs.OverlaySynchronizer#synchronize" class="unstable">
+                    <a href="olcs.OverlaySynchronizer.html#synchronize">synchronize</a>
+                </li>
+            
+            </ul>
+            <ul class="fires itemMembers">
+            
+            </ul>
+        </li>
+    
         <li class="item" data-name="olcs.RasterSynchronizer">
             <span class="title">
                 <a href="olcs.RasterSynchronizer.html">olcs.RasterSynchronizer</a>
@@ -324,6 +365,35 @@
             
             </ul>
             <ul class="methods itemMembers">
+            
+            </ul>
+            <ul class="fires itemMembers">
+            
+            </ul>
+        </li>
+    
+        <li class="item" data-name="olcs.SynchronizedOverlay">
+            <span class="title">
+                <a href="olcs.SynchronizedOverlay.html">olcs.SynchronizedOverlay</a>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="olcs.SynchronizedOverlay#destroy" class="unstable">
+                    <a href="olcs.SynchronizedOverlay.html#destroy">destroy</a>
+                </li>
+            
+                <li data-name="olcs.SynchronizedOverlay#getScene" class="unstable">
+                    <a href="olcs.SynchronizedOverlay.html#getScene">getScene</a>
+                </li>
             
             </ul>
             <ul class="fires itemMembers">
@@ -436,6 +506,10 @@
                     <a href="olcs.core.html#.lookAt">lookAt</a>
                 </li>
             
+                <li data-name="olcs.core.normalizeView" class="unstable">
+                    <a href="olcs.core.html#.normalizeView">normalizeView</a>
+                </li>
+            
                 <li data-name="olcs.core.ol4326CoordinateArrayToCsCartesians" class="unstable">
                     <a href="olcs.core.html#.ol4326CoordinateArrayToCsCartesians">ol4326CoordinateArrayToCsCartesians</a>
                 </li>
@@ -460,8 +534,16 @@
                     <a href="olcs.core.html#.pickOnTerrainOrEllipsoid">pickOnTerrainOrEllipsoid</a>
                 </li>
             
+                <li data-name="olcs.core.resetToNorthZenith" class="unstable">
+                    <a href="olcs.core.html#.resetToNorthZenith">resetToNorthZenith</a>
+                </li>
+            
                 <li data-name="olcs.core.rotateAroundAxis" class="unstable">
                     <a href="olcs.core.html#.rotateAroundAxis">rotateAroundAxis</a>
+                </li>
+            
+                <li data-name="olcs.core.rotateAroundBottomCenter" class="unstable">
+                    <a href="olcs.core.html#.rotateAroundBottomCenter">rotateAroundBottomCenter</a>
                 </li>
             
                 <li data-name="olcs.core.setHeadingUsingBottomCenter" class="unstable">
@@ -492,12 +574,14 @@
     
     <section>
         <article>
-            <pre class="prettyprint source"><code>// Ol3-Cesium typedef externs, sorted alphabetically
+            <pre class="prettyprint source"><code>/**
+ * @externs
+ */
 
 /**
- * @type {Object}
+ * @const
  */
-var olcsx;
+var olcsx = {};
 
 
 /**
@@ -506,6 +590,7 @@ var olcsx;
  *   target: (Element|string|undefined),
  *   createSynchronizers: (undefined|function(!ol.Map, !Cesium.Scene, !Cesium.DataSourceCollection): Array.&lt;olcs.AbstractSynchronizer>),
  *   time: (undefined|function(): Cesium.JulianDate),
+ *   stopOpenLayersEventsPropagation: (boolean|undefined),
  *   sceneOptions: (Cesium.SceneOptions|undefined)
  * }}
  * @api
@@ -541,7 +626,6 @@ olcsx.OLCesiumOptions.prototype.sceneOptions;
  */
 olcsx.OLCesiumOptions.prototype.target;
 
-
 /**
  * Callback function which will be called by the {@link olcs.OLCesium}
  * constructor to create custom synchronizers. Receives an `ol.Map` and a
@@ -552,12 +636,18 @@ olcsx.OLCesiumOptions.prototype.target;
  */
 olcsx.OLCesiumOptions.prototype.createSynchronizers;
 
+/**
+ * Prevent propagation of mouse/touch events to OpenLayers when Cesium is active.
+ * @type {boolean|undefined}
+ */
+olcsx.OLCesiumOptions.prototype.stopOpenLayersEventsPropagation;
+
 
 /**
  * Core namespace.
- * @type {Object}
+ * @const
  */
-olcsx.core;
+olcsx.core = {};
 
 
 /**
@@ -604,6 +694,33 @@ olcsx.core.CesiumUrlDefinition;
  * }}
  */
 olcsx.LayerWithParents;
+
+
+/**
+ * Options for SynchronizedOverlay
+ * @typedef {{
+ *  scene: !Cesium.Scene,
+ *  parent: !ol.Overlay,
+ *  synchronizer: !olcs.OverlaySynchronizer
+ * }}
+ * @api
+ */
+olcsx.SynchronizedOverlayOptions;
+
+
+/**
+ * @const
+ */
+olcsx.contrib = {};
+
+/**
+ * @typedef {{
+ *   map: ol.Map,
+ *   cameraExtentInRadians: (ol.Extent|undefined)
+ * }}
+ * @api
+ */
+olcsx.contrib.ManagerOptions;
 </code></pre>
         </article>
     </section>
@@ -613,7 +730,7 @@ olcsx.LayerWithParents;
 
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Oct 26 2017 16:36:45 GMT+0200 (CEST)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Dec 07 2017 17:47:01 GMT+0100 (CET)
         </footer>
     </div>
 </div>

@@ -286,6 +286,10 @@
                     <a href="olcs.OLCesium.html#getOlMap">getOlMap</a>
                 </li>
             
+                <li data-name="olcs.OLCesium#getOlView" class="unstable">
+                    <a href="olcs.OLCesium.html#getOlView">getOlView</a>
+                </li>
+            
                 <li data-name="olcs.OLCesium#setBlockCesiumRendering" class="unstable">
                     <a href="olcs.OLCesium.html#setBlockCesiumRendering">setBlockCesiumRendering</a>
                 </li>
@@ -312,6 +316,43 @@
             </ul>
         </li>
     
+        <li class="item" data-name="olcs.OverlaySynchronizer">
+            <span class="title">
+                <a href="olcs.OverlaySynchronizer.html">olcs.OverlaySynchronizer</a>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="olcs.OverlaySynchronizer#addOverlay" class="unstable">
+                    <a href="olcs.OverlaySynchronizer.html#addOverlay">addOverlay</a>
+                </li>
+            
+                <li data-name="olcs.OverlaySynchronizer#addOverlays" class="unstable">
+                    <a href="olcs.OverlaySynchronizer.html#addOverlays">addOverlays</a>
+                </li>
+            
+                <li data-name="olcs.OverlaySynchronizer#removeOverlay" class="unstable">
+                    <a href="olcs.OverlaySynchronizer.html#removeOverlay">removeOverlay</a>
+                </li>
+            
+                <li data-name="olcs.OverlaySynchronizer#synchronize" class="unstable">
+                    <a href="olcs.OverlaySynchronizer.html#synchronize">synchronize</a>
+                </li>
+            
+            </ul>
+            <ul class="fires itemMembers">
+            
+            </ul>
+        </li>
+    
         <li class="item" data-name="olcs.RasterSynchronizer">
             <span class="title">
                 <a href="olcs.RasterSynchronizer.html">olcs.RasterSynchronizer</a>
@@ -324,6 +365,35 @@
             
             </ul>
             <ul class="methods itemMembers">
+            
+            </ul>
+            <ul class="fires itemMembers">
+            
+            </ul>
+        </li>
+    
+        <li class="item" data-name="olcs.SynchronizedOverlay">
+            <span class="title">
+                <a href="olcs.SynchronizedOverlay.html">olcs.SynchronizedOverlay</a>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="olcs.SynchronizedOverlay#destroy" class="unstable">
+                    <a href="olcs.SynchronizedOverlay.html#destroy">destroy</a>
+                </li>
+            
+                <li data-name="olcs.SynchronizedOverlay#getScene" class="unstable">
+                    <a href="olcs.SynchronizedOverlay.html#getScene">getScene</a>
+                </li>
             
             </ul>
             <ul class="fires itemMembers">
@@ -436,6 +506,10 @@
                     <a href="olcs.core.html#.lookAt">lookAt</a>
                 </li>
             
+                <li data-name="olcs.core.normalizeView" class="unstable">
+                    <a href="olcs.core.html#.normalizeView">normalizeView</a>
+                </li>
+            
                 <li data-name="olcs.core.ol4326CoordinateArrayToCsCartesians" class="unstable">
                     <a href="olcs.core.html#.ol4326CoordinateArrayToCsCartesians">ol4326CoordinateArrayToCsCartesians</a>
                 </li>
@@ -460,8 +534,16 @@
                     <a href="olcs.core.html#.pickOnTerrainOrEllipsoid">pickOnTerrainOrEllipsoid</a>
                 </li>
             
+                <li data-name="olcs.core.resetToNorthZenith" class="unstable">
+                    <a href="olcs.core.html#.resetToNorthZenith">resetToNorthZenith</a>
+                </li>
+            
                 <li data-name="olcs.core.rotateAroundAxis" class="unstable">
                     <a href="olcs.core.html#.rotateAroundAxis">rotateAroundAxis</a>
+                </li>
+            
+                <li data-name="olcs.core.rotateAroundBottomCenter" class="unstable">
+                    <a href="olcs.core.html#.rotateAroundBottomCenter">rotateAroundBottomCenter</a>
                 </li>
             
                 <li data-name="olcs.core.setHeadingUsingBottomCenter" class="unstable">
@@ -497,6 +579,8 @@ goog.require('ol.geom.Point');
 
 goog.require('goog.asserts');
 goog.require('ol.proj');
+goog.require('ol.events');
+goog.require('ol.MapBrowserEventType');
 
 goog.require('olcs.util');
 goog.require('olcs.core');
@@ -504,6 +588,7 @@ goog.require('olcs.AutoRenderLoop');
 goog.require('olcs.Camera');
 goog.require('olcs.RasterSynchronizer');
 goog.require('olcs.VectorSynchronizer');
+goog.require('olcs.OverlaySynchronizer');
 
 
 
@@ -596,6 +681,24 @@ olcs.OLCesium = function(options) {
    */
   this.isOverMap_ = !targetElement;
 
+
+  if (this.isOverMap_ &amp;&amp; options.stopOpenLayersEventsPropagation) {
+    const overlayEvents = [
+      ol.events.EventType.CLICK,
+      ol.events.EventType.DBLCLICK,
+      ol.events.EventType.MOUSEDOWN,
+      ol.events.EventType.TOUCHSTART,
+      ol.events.EventType.MSPOINTERDOWN,
+      ol.MapBrowserEventType.POINTERDOWN,
+      ol.events.EventType.MOUSEWHEEL,
+      ol.events.EventType.WHEEL
+    ];
+    for (let i = 0, ii = overlayEvents.length; i &lt; ii; ++i) {
+      ol.events.listen(this.container_, overlayEvents[i], ol.events.Event.stopPropagation);
+    }
+  }
+
+
   /**
    * @type {!HTMLCanvasElement}
    * @private
@@ -684,7 +787,8 @@ olcs.OLCesium = function(options) {
   const synchronizers = options.createSynchronizers ?
     options.createSynchronizers(this.map_, this.scene_, this.dataSourceCollection_) : [
       new olcs.RasterSynchronizer(this.map_, this.scene_),
-      new olcs.VectorSynchronizer(this.map_, this.scene_)
+      new olcs.VectorSynchronizer(this.map_, this.scene_),
+      new olcs.OverlaySynchronizer(this.map_, this.scene_)
     ];
 
   // Assures correct canvas size after initialisation
@@ -768,6 +872,14 @@ olcs.OLCesium = function(options) {
 
   const eventHelper = new Cesium.EventHelper();
   eventHelper.add(this.scene_.postRender, olcs.OLCesium.prototype.updateTrackedEntity_, this);
+
+  // Cesium has a mechanism to prevent the camera to go under the terrain.
+  // Unfortunately, it is only active when all the terrain has been loaded, which:
+  // - does not prevent the camera to sink under terrain anymore;
+  // - introduce a jumping effect once all terrain has been loaded and the position of the camera is finally fixed.
+  // The property below enables a workaround found in the Camptocamp Cesium fork.
+  // See also https://github.com/AnalyticalGraphicsInc/cesium/issues/5999.
+  Cesium.Camera.enableSuspendTerrainAdjustment = false;
 };
 
 
@@ -970,6 +1082,15 @@ olcs.OLCesium.prototype.getOlMap = function() {
   return this.map_;
 };
 
+/**
+ * @return {!ol.View}
+ * @api
+ */
+olcs.OLCesium.prototype.getOlView = function() {
+  const view = this.map_.getView();
+  goog.asserts.assert(view);
+  return view;
+};
 
 /**
  * @return {!Cesium.Scene}
@@ -1037,7 +1158,11 @@ olcs.OLCesium.prototype.setEnabled = function(enable) {
         this.hiddenRootGroup_ = rootGroup;
         this.hiddenRootGroup_.setVisible(false);
       }
+
+      this.map_.getOverlayContainer().classList.add('olcs-hideoverlay');
+      this.map_.getOverlayContainerStopEvent().classList.add('olcs-hideoverlay');
     }
+
     this.camera_.readFromView();
     this.render_();
   } else {
@@ -1047,7 +1172,8 @@ olcs.OLCesium.prototype.setEnabled = function(enable) {
         interactions.push(interaction);
       });
       this.pausedInteractions_.length = 0;
-
+      this.map_.getOverlayContainer().classList.remove('olcs-hideoverlay');
+      this.map_.getOverlayContainerStopEvent().classList.remove('olcs-hideoverlay');
       if (this.hiddenRootGroup_) {
         this.hiddenRootGroup_.setVisible(true);
         this.hiddenRootGroup_ = null;
@@ -1183,6 +1309,7 @@ olcs.OLCesium.prototype.throwOnUnitializedMap_ = function() {
     throw new Error(`The OpenLayers map is not properly initialized: ${center} / ${view.getResolution()}`);
   }
 };
+
 </code></pre>
         </article>
     </section>
@@ -1192,7 +1319,7 @@ olcs.OLCesium.prototype.throwOnUnitializedMap_ = function() {
 
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Oct 26 2017 16:36:45 GMT+0200 (CEST)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Dec 07 2017 17:47:01 GMT+0100 (CET)
         </footer>
     </div>
 </div>

@@ -286,6 +286,10 @@
                     <a href="olcs.OLCesium.html#getOlMap">getOlMap</a>
                 </li>
             
+                <li data-name="olcs.OLCesium#getOlView" class="unstable">
+                    <a href="olcs.OLCesium.html#getOlView">getOlView</a>
+                </li>
+            
                 <li data-name="olcs.OLCesium#setBlockCesiumRendering" class="unstable">
                     <a href="olcs.OLCesium.html#setBlockCesiumRendering">setBlockCesiumRendering</a>
                 </li>
@@ -312,6 +316,43 @@
             </ul>
         </li>
     
+        <li class="item" data-name="olcs.OverlaySynchronizer">
+            <span class="title">
+                <a href="olcs.OverlaySynchronizer.html">olcs.OverlaySynchronizer</a>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="olcs.OverlaySynchronizer#addOverlay" class="unstable">
+                    <a href="olcs.OverlaySynchronizer.html#addOverlay">addOverlay</a>
+                </li>
+            
+                <li data-name="olcs.OverlaySynchronizer#addOverlays" class="unstable">
+                    <a href="olcs.OverlaySynchronizer.html#addOverlays">addOverlays</a>
+                </li>
+            
+                <li data-name="olcs.OverlaySynchronizer#removeOverlay" class="unstable">
+                    <a href="olcs.OverlaySynchronizer.html#removeOverlay">removeOverlay</a>
+                </li>
+            
+                <li data-name="olcs.OverlaySynchronizer#synchronize" class="unstable">
+                    <a href="olcs.OverlaySynchronizer.html#synchronize">synchronize</a>
+                </li>
+            
+            </ul>
+            <ul class="fires itemMembers">
+            
+            </ul>
+        </li>
+    
         <li class="item" data-name="olcs.RasterSynchronizer">
             <span class="title">
                 <a href="olcs.RasterSynchronizer.html">olcs.RasterSynchronizer</a>
@@ -324,6 +365,35 @@
             
             </ul>
             <ul class="methods itemMembers">
+            
+            </ul>
+            <ul class="fires itemMembers">
+            
+            </ul>
+        </li>
+    
+        <li class="item" data-name="olcs.SynchronizedOverlay">
+            <span class="title">
+                <a href="olcs.SynchronizedOverlay.html">olcs.SynchronizedOverlay</a>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="olcs.SynchronizedOverlay#destroy" class="unstable">
+                    <a href="olcs.SynchronizedOverlay.html#destroy">destroy</a>
+                </li>
+            
+                <li data-name="olcs.SynchronizedOverlay#getScene" class="unstable">
+                    <a href="olcs.SynchronizedOverlay.html#getScene">getScene</a>
+                </li>
             
             </ul>
             <ul class="fires itemMembers">
@@ -436,6 +506,10 @@
                     <a href="olcs.core.html#.lookAt">lookAt</a>
                 </li>
             
+                <li data-name="olcs.core.normalizeView" class="unstable">
+                    <a href="olcs.core.html#.normalizeView">normalizeView</a>
+                </li>
+            
                 <li data-name="olcs.core.ol4326CoordinateArrayToCsCartesians" class="unstable">
                     <a href="olcs.core.html#.ol4326CoordinateArrayToCsCartesians">ol4326CoordinateArrayToCsCartesians</a>
                 </li>
@@ -460,8 +534,16 @@
                     <a href="olcs.core.html#.pickOnTerrainOrEllipsoid">pickOnTerrainOrEllipsoid</a>
                 </li>
             
+                <li data-name="olcs.core.resetToNorthZenith" class="unstable">
+                    <a href="olcs.core.html#.resetToNorthZenith">resetToNorthZenith</a>
+                </li>
+            
                 <li data-name="olcs.core.rotateAroundAxis" class="unstable">
                     <a href="olcs.core.html#.rotateAroundAxis">rotateAroundAxis</a>
+                </li>
+            
+                <li data-name="olcs.core.rotateAroundBottomCenter" class="unstable">
+                    <a href="olcs.core.html#.rotateAroundBottomCenter">rotateAroundBottomCenter</a>
                 </li>
             
                 <li data-name="olcs.core.setHeadingUsingBottomCenter" class="unstable">
@@ -1753,6 +1835,156 @@ If a globe is given, the target height is first interpolated from terrain.</p>
 <dt class="unstable">
     <div class="nameContainer">
         
+        <h4 class="name" id=".normalizeView">
+            olcs.core.normalizeView<span class="signature">(view, <span class="optional">angle</span>)</span>
+            
+            
+<span class="stability experimental">experimental</span>
+
+
+        </h4>
+        
+        <div class="tag-source">
+            <a href="src_olcs_core.js.html">src/olcs/core.js</a>, <a href="src_olcs_core.js.html#line609">line 609</a>
+        </div>
+        
+        
+    </div>
+    
+</dt>
+<dd class="unstable">
+    
+    
+    <div class="description">
+        <p>Set the OpenLayers view to a specific rotation and
+the nearest resolution.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr class="">
+            
+                <td class="name"><code>view</code></td>
+            
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">ol.View</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            <td  class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	
+        <tr class="">
+            
+                <td class="name"><code>angle</code></td>
+            
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            <td  class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt class="unstable">
+    <div class="nameContainer">
+        
         <h4 class="name" id=".ol4326CoordinateArrayToCsCartesians">
             olcs.core.ol4326CoordinateArrayToCsCartesians<span class="signature">(coordinates)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{Array.&lt;Cesium.Cartesian3>}</span>
             
@@ -2587,6 +2819,161 @@ and the properties will be shallow copied.</p>
 <dt class="unstable">
     <div class="nameContainer">
         
+        <h4 class="name" id=".resetToNorthZenith">
+            olcs.core.resetToNorthZenith<span class="signature">(map, scene)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{Promise.&lt;undefined>}</span>
+            
+            
+<span class="stability experimental">experimental</span>
+
+
+        </h4>
+        
+        <div class="tag-source">
+            <a href="src_olcs_core.js.html">src/olcs/core.js</a>, <a href="src_olcs_core.js.html#line544">line 544</a>
+        </div>
+        
+        
+    </div>
+    
+</dt>
+<dd class="unstable">
+    
+    
+    <div class="description">
+        <p>Animate the return to a top-down view from the zenith.
+The camera is rotated to orient to the North.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr class="">
+            
+                <td class="name"><code>map</code></td>
+            
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">ol.Map</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            <td  class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	
+        <tr class="">
+            
+                <td class="name"><code>scene</code></td>
+            
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Cesium.Scene</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            <td  class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+</dd>
+
+        
+            
+<dt class="unstable">
+    <div class="nameContainer">
+        
         <h4 class="name" id=".rotateAroundAxis">
             olcs.core.rotateAroundAxis<span class="signature">(camera, angle, axis, transform, <span class="optional">opt_options</span>)</span>
             
@@ -2806,6 +3193,156 @@ and the properties will be shallow copied.</p>
     
     
     
+    
+    
+    
+</dd>
+
+        
+            
+<dt class="unstable">
+    <div class="nameContainer">
+        
+        <h4 class="name" id=".rotateAroundBottomCenter">
+            olcs.core.rotateAroundBottomCenter<span class="signature">(scene, angle)</span><span class="glyphicon glyphicon-circle-arrow-right"></span><span class="type-signature returnType">{Promise.&lt;undefined>}</span>
+            
+            
+<span class="stability experimental">experimental</span>
+
+
+        </h4>
+        
+        <div class="tag-source">
+            <a href="src_olcs_core.js.html">src/olcs/core.js</a>, <a href="src_olcs_core.js.html#line584">line 584</a>
+        </div>
+        
+        
+    </div>
+    
+</dt>
+<dd class="unstable">
+    
+    
+
+    
+    
+    
+    
+    
+    
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr class="">
+            
+                <td class="name"><code>scene</code></td>
+            
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Cesium.Scene</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            <td  class="description last">
+                
+                </td>
+        </tr>
+	
+	
+	
+        <tr class="">
+            
+                <td class="name"><code>angle</code></td>
+            
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            <td  class="description last">
+                
+                <p>in radian</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+
+
     
     
     
@@ -3339,7 +3876,7 @@ to the given Cesium ImageryLayer.</p>
 
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Oct 26 2017 16:36:45 GMT+0200 (CEST)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Dec 07 2017 17:47:01 GMT+0100 (CET)
         </footer>
     </div>
 </div>

@@ -286,6 +286,10 @@
                     <a href="olcs.OLCesium.html#getOlMap">getOlMap</a>
                 </li>
             
+                <li data-name="olcs.OLCesium#getOlView" class="unstable">
+                    <a href="olcs.OLCesium.html#getOlView">getOlView</a>
+                </li>
+            
                 <li data-name="olcs.OLCesium#setBlockCesiumRendering" class="unstable">
                     <a href="olcs.OLCesium.html#setBlockCesiumRendering">setBlockCesiumRendering</a>
                 </li>
@@ -312,6 +316,43 @@
             </ul>
         </li>
     
+        <li class="item" data-name="olcs.OverlaySynchronizer">
+            <span class="title">
+                <a href="olcs.OverlaySynchronizer.html">olcs.OverlaySynchronizer</a>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="olcs.OverlaySynchronizer#addOverlay" class="unstable">
+                    <a href="olcs.OverlaySynchronizer.html#addOverlay">addOverlay</a>
+                </li>
+            
+                <li data-name="olcs.OverlaySynchronizer#addOverlays" class="unstable">
+                    <a href="olcs.OverlaySynchronizer.html#addOverlays">addOverlays</a>
+                </li>
+            
+                <li data-name="olcs.OverlaySynchronizer#removeOverlay" class="unstable">
+                    <a href="olcs.OverlaySynchronizer.html#removeOverlay">removeOverlay</a>
+                </li>
+            
+                <li data-name="olcs.OverlaySynchronizer#synchronize" class="unstable">
+                    <a href="olcs.OverlaySynchronizer.html#synchronize">synchronize</a>
+                </li>
+            
+            </ul>
+            <ul class="fires itemMembers">
+            
+            </ul>
+        </li>
+    
         <li class="item" data-name="olcs.RasterSynchronizer">
             <span class="title">
                 <a href="olcs.RasterSynchronizer.html">olcs.RasterSynchronizer</a>
@@ -324,6 +365,35 @@
             
             </ul>
             <ul class="methods itemMembers">
+            
+            </ul>
+            <ul class="fires itemMembers">
+            
+            </ul>
+        </li>
+    
+        <li class="item" data-name="olcs.SynchronizedOverlay">
+            <span class="title">
+                <a href="olcs.SynchronizedOverlay.html">olcs.SynchronizedOverlay</a>
+                
+            </span>
+            <ul class="members itemMembers">
+            
+            </ul>
+            <ul class="typedefs itemMembers">
+            
+            </ul>
+            <ul class="methods itemMembers">
+            
+            <span class="subtitle">Methods</span>
+            
+                <li data-name="olcs.SynchronizedOverlay#destroy" class="unstable">
+                    <a href="olcs.SynchronizedOverlay.html#destroy">destroy</a>
+                </li>
+            
+                <li data-name="olcs.SynchronizedOverlay#getScene" class="unstable">
+                    <a href="olcs.SynchronizedOverlay.html#getScene">getScene</a>
+                </li>
             
             </ul>
             <ul class="fires itemMembers">
@@ -436,6 +506,10 @@
                     <a href="olcs.core.html#.lookAt">lookAt</a>
                 </li>
             
+                <li data-name="olcs.core.normalizeView" class="unstable">
+                    <a href="olcs.core.html#.normalizeView">normalizeView</a>
+                </li>
+            
                 <li data-name="olcs.core.ol4326CoordinateArrayToCsCartesians" class="unstable">
                     <a href="olcs.core.html#.ol4326CoordinateArrayToCsCartesians">ol4326CoordinateArrayToCsCartesians</a>
                 </li>
@@ -460,8 +534,16 @@
                     <a href="olcs.core.html#.pickOnTerrainOrEllipsoid">pickOnTerrainOrEllipsoid</a>
                 </li>
             
+                <li data-name="olcs.core.resetToNorthZenith" class="unstable">
+                    <a href="olcs.core.html#.resetToNorthZenith">resetToNorthZenith</a>
+                </li>
+            
                 <li data-name="olcs.core.rotateAroundAxis" class="unstable">
                     <a href="olcs.core.html#.rotateAroundAxis">rotateAroundAxis</a>
+                </li>
+            
+                <li data-name="olcs.core.rotateAroundBottomCenter" class="unstable">
+                    <a href="olcs.core.html#.rotateAroundBottomCenter">rotateAroundBottomCenter</a>
                 </li>
             
                 <li data-name="olcs.core.setHeadingUsingBottomCenter" class="unstable">
@@ -496,15 +578,16 @@
 
 goog.require('olcs.contrib.LazyLoader');
 goog.require('olcs.OLCesium');
+goog.require('olcs.core');
 
-goog.require('ol.extent');
+goog.require('ol.math');
 goog.require('goog.asserts');
 
 
 olcs.contrib.Manager = class {
   /**
    * @param {string} cesiumUrl
-   * @param {{map: ol.Map, cameraExtentInRadians: ol.Extent}} options
+   * @param {olcsx.contrib.ManagerOptions} options
    * @api
    */
   constructor(cesiumUrl, {map, cameraExtentInRadians} = {}) {
@@ -523,9 +606,21 @@ olcs.contrib.Manager = class {
 
     /**
      * @type {ol.Extent}
+     * @protected
+     */
+    this.cameraExtentInRadians = cameraExtentInRadians || null;
+
+    /**
+     * @private
+     * @type {Cesium.BoundingSphere}
+     */
+    this.boundingSphere_;
+
+    /**
+     * @type {boolean}
      * @private
      */
-    this.cameraExtentInRadians_ = cameraExtentInRadians;
+    this.blockLimiter_ = false;
 
     /**
      * @type {Promise.&lt;olcs.OLCesium>}
@@ -538,6 +633,46 @@ olcs.contrib.Manager = class {
      * @protected
      */
     this.ol3d;
+
+
+    /**
+     * @const {number} Tilt angle in radians
+     * @private
+     */
+    this.cesiumInitialTilt_ = ol.math.toRadians(50);
+
+    /**
+     * @protected
+     * @type {number}
+     */
+    this.fogDensity = 0.0001;
+
+    /**
+     * @protected
+     * @type {number}
+     */
+    this.fogSSEFactor = 25;
+
+    /**
+     * Limit the minimum distance to the terrain to 2m.
+     * @protected
+     * @type {number}
+     */
+    this.minimumZoomDistance = 2;
+
+    /**
+     * Limit the maximum distance to the earth to 10'000km.
+     * @protected
+     * @type {number}
+     */
+    this.maximumZoomDistance = 10000000;
+
+    // when closer to 3000m, restrict the available positions harder
+    /**
+     * @protected
+     * @param {number} height
+     */
+    this.limitCameraToBoundingSphereRatio = height => (height > 3000 ? 9 : 3);
   }
 
 
@@ -558,9 +693,17 @@ olcs.contrib.Manager = class {
    * @return {olcs.OLCesium}
    */
   onCesiumLoaded() {
+    if (this.cameraExtentInRadians) {
+      const rect = new Cesium.Rectangle(...this.cameraExtentInRadians);
+      // Set the fly home rectangle
+      Cesium.Camera.DEFAULT_VIEW_RECTANGLE = rect;
+      this.boundingSphere_ = Cesium.BoundingSphere.fromRectangle3D(rect, Cesium.Ellipsoid.WGS84, 300); // lux mean height is 300m
+    }
+
     this.ol3d = this.instantiateOLCesium();
-    this.configureForUsability();
-    this.configureForPerformance();
+    const scene = this.ol3d.getCesiumScene();
+    this.configureForUsability(scene);
+    this.configureForPerformance(scene);
     return this.ol3d;
   }
 
@@ -582,72 +725,67 @@ olcs.contrib.Manager = class {
 
 
   /**
+   * @param {!Cesium.Scene} scene The scene, passed as parameter for convenience.
    * @protected
    */
-  configureForPerformance() {
-    const scene = this.ol3d.getCesiumScene();
+  configureForPerformance(scene) {
     const fog = scene.fog;
-    fog.density = 0.0001;
-    fog.screenSpaceErrorFactor = 25;
+    fog.enabled = true;
+    fog.density = this.fogDensity;
+    fog.screenSpaceErrorFactor = this.fogSSEFactor;
   }
 
 
   /**
+   * @param {!Cesium.Scene} scene The scene, passed as parameter for convenience.
    * @protected
    */
-  configureForUsability() {
-    const scene = this.ol3d.getCesiumScene();
+  configureForUsability(scene) {
     const sscController = scene.screenSpaceCameraController;
-
-    // To avoid going under the terrain, limit the minimum distance to 30m
-    sscController.minimumZoomDistance = 30;
-
-    // To avoid getting lost in space, limit the maximum distance to 10'000km
-    sscController.maximumZoomDistance = 10000000;
+    sscController.minimumZoomDistance = this.minimumZoomDistance;
+    sscController.maximumZoomDistance = this.maximumZoomDistance;
 
     // Do not see through the terrain. Seeing through the terrain does not make
     // sense anyway, except for debugging
     scene.globe.depthTestAgainstTerrain = true;
 
-    if (this.cameraExtentInRadians_) {
-      scene.postRender.addEventListener(this.limitCameraToExtent.bind(this), scene);
-    }
+    // Use white instead of the black default colour for the globe when tiles are missing
+    scene.globe.baseColor = Cesium.Color.WHITE;
+    scene.backgroundColor = Cesium.Color.WHITE;
 
+    if (this.boundingSphere_) {
+      scene.postRender.addEventListener(this.limitCameraToBoundingSphere.bind(this), scene);
+    }
     // Stop rendering Cesium when there is nothing to do. This drastically reduces CPU/GPU consumption.
     this.ol3d.enableAutoRenderLoop();
   }
 
 
   /**
-   * Constrain the camera so that it stays in a 3D volume above a map extent.
-   * Near the ground the extent is small. Far from the ground the extent is larger.
+   * Constrain the camera so that it stays close to the bounding sphere of the map extent.
+   * Near the ground the allowed distance is shorter.
    * @protected
    */
-  limitCameraToExtent() {
-    const scene = this.ol3d.getCesiumScene();
-    const camera = scene.camera;
-    const extent = this.cameraExtentInRadians_;
-    const pos = camera.positionCartographic.clone();
-    const inside = ol.extent.containsXY(extent, pos.longitude, pos.latitude);
-    if (!inside) {
-      // add a padding based on the camera height
-      const padding = Math.max(0, pos.height * 0.05 / 500000);
-      let lon = pos.longitude;
-      let lat = pos.latitude;
-      lon = Math.max(extent[0] - padding, lon);
-      lat = Math.max(extent[1] - padding, lat);
-      lon = Math.min(extent[2] + padding, lon);
-      lat = Math.min(extent[3] + padding, lat);
-      if (lon !== pos.longitude || lat !== pos.latitude) {
-        pos.longitude = lon;
-        pos.latitude = lat;
-        camera.setView({
-          destination: Cesium.Ellipsoid.WGS84.cartographicToCartesian(pos),
-          orientation: {
-            heading: camera.heading,
-            pitch: camera.pitch
-          }
-        });
+  limitCameraToBoundingSphere() {
+    if (this.boundingSphere_ &amp;&amp; !this.blockLimiter_) {
+      const scene = this.ol3d.getCesiumScene();
+      const camera = scene.camera;
+      const position = camera.position;
+      const carto = Cesium.Cartographic.fromCartesian(position);
+      const ratio = this.limitCameraToBoundingSphereRatio(carto.height);
+      if (Cesium.Cartesian3.distance(this.boundingSphere_.center, position) > this.boundingSphere_.radius * ratio) {
+        const currentlyFlying = camera.flying;
+        if (currentlyFlying === true) {
+          // There is a flying property and its value is true
+          return;
+        } else {
+          this.blockLimiter_ = true;
+          const unblockLimiter = () => this.blockLimiter_ = false;
+          camera.flyToBoundingSphere(this.boundingSphere_, {
+            complete: unblockLimiter,
+            cancel: unblockLimiter
+          });
+        }
       }
     }
   }
@@ -655,21 +793,137 @@ olcs.contrib.Manager = class {
 
   /**
    * Enable or disable ol3d with a default animation.
-   * @api
+   * @export
+   * @return {Promise&lt;undefined>}
    */
-  toggle3D() {
-    this.load().then((ol3d) => {
-      ol3d.setEnabled(!ol3d.getEnabled());
+  toggle3d() {
+    return this.load().then((/** @const {!olcs.OLCesium} */ ol3d) => {
+      const is3DCurrentlyEnabled = ol3d.getEnabled();
+      const scene = ol3d.getCesiumScene();
+      if (is3DCurrentlyEnabled) {
+        // Disable 3D
+        goog.asserts.assert(this.map);
+        return olcs.core.resetToNorthZenith(this.map, scene).then(() => {
+          ol3d.setEnabled(false);
+        });
+      } else {
+        // Enable 3D
+        ol3d.setEnabled(true);
+        return olcs.core.rotateAroundBottomCenter(scene, this.cesiumInitialTilt_);
+      }
     });
   }
 
 
   /**
-   * @api
+   * @export
    * @return {boolean}
    */
   is3dEnabled() {
     return !!this.ol3d &amp;&amp; this.ol3d.getEnabled();
+  }
+
+
+  /**
+   * @return {number}
+   */
+  getHeading() {
+    return this.map ? this.map.getView().getRotation() || 0 : 0;
+  }
+
+
+  /**
+   * @return {number|undefined}
+   */
+  getTiltOnGlobe() {
+    const scene = this.ol3d.getCesiumScene();
+    const tiltOnGlobe = olcs.core.computeSignedTiltAngleOnGlobe(scene);
+    return -tiltOnGlobe;
+  }
+
+
+  /**
+   * @param {number} angle
+   */
+  setHeading(angle) {
+    const scene = this.ol3d.getCesiumScene();
+    const bottom = olcs.core.pickBottomPoint(scene);
+    if (bottom) {
+      olcs.core.setHeadingUsingBottomCenter(scene, angle, bottom);
+    }
+  }
+
+  /**
+   * @export
+   * @return {olcs.OLCesium}
+   */
+  getOl3d() {
+    return this.ol3d;
+  }
+
+  /**
+   * @export
+   * @return {!ol.View}
+   */
+  getOlView() {
+    const view = this.map.getView();
+    goog.asserts.assert(view);
+    return view;
+  }
+
+  /**
+   * @export
+   * @return {Cesium.Matrix4}
+   */
+  getCesiumViewMatrix() {
+    return this.ol3d.getCesiumScene().camera.viewMatrix;
+  }
+
+  /**
+   * @export
+   * @return {!Cesium.Scene}
+   */
+  getCesiumScene() {
+    return this.ol3d.getCesiumScene();
+  }
+
+  /**
+   * @export
+   * @param {!Cesium.Rectangle} rectangle
+   * @param {number=} offset in meters
+   * @return {Promise&lt;undefined>}
+   */
+  flyToRectangle(rectangle, offset = 0) {
+    const camera = this.getCesiumScene().camera;
+    const destination = camera.getRectangleCameraCoordinates(rectangle);
+
+    const mag = Cesium.Cartesian3.magnitude(destination) + offset;
+    Cesium.Cartesian3.normalize(destination, destination);
+    Cesium.Cartesian3.multiplyByScalar(destination, mag, destination);
+
+    return new Promise((resolve, reject) => {
+      if (!this.cameraExtentInRadians) {
+        reject();
+        return;
+      }
+
+      camera.flyTo({
+        destination,
+        complete: () => resolve(),
+        cancel: () => reject(),
+        endTransform: Cesium.Matrix4.IDENTITY
+      });
+    });
+  }
+
+  /**
+   * @protected
+   * @return {Cesium.Rectangle|undefined}
+   */
+  getCameraExtentRectangle() {
+    if (this.cameraExtentInRadians) {
+      return new Cesium.Rectangle(...this.cameraExtentInRadians);
+    }
   }
 };
 </code></pre>
@@ -681,7 +935,7 @@ olcs.contrib.Manager = class {
 
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Oct 26 2017 16:36:45 GMT+0200 (CEST)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Dec 07 2017 17:47:01 GMT+0100 (CET)
         </footer>
     </div>
 </div>

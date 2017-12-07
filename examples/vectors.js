@@ -205,11 +205,8 @@ const vectorSource2 = new ol.source.Vector({
   features: [iconFeature, textFeature, cervinFeature, cartographicRectangle,
     cartographicRectangle2]
 });
-const imageVectorSource = new ol.source.ImageVector({
+const vectorLayer2 = new ol.layer.Vector({
   source: vectorSource2
-});
-const vectorLayer2 = new ol.layer.Image({
-  source: imageVectorSource
 });
 
 const dragAndDropInteraction = new ol.interaction.DragAndDrop({
