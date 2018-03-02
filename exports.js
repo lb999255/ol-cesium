@@ -4684,6 +4684,10 @@ goog.exportSymbol(
     olcs.core.applyHeightOffsetToGeometry);
 
 goog.exportSymbol(
+    'olcs.core.createMatrixAtCoordinates',
+    olcs.core.createMatrixAtCoordinates);
+
+goog.exportSymbol(
     'olcs.core.rotateAroundAxis',
     olcs.core.rotateAroundAxis);
 
@@ -4787,6 +4791,11 @@ goog.exportProperty(
     olcs.FeatureConverter.prototype,
     'getHeightReference',
     olcs.FeatureConverter.prototype.getHeightReference);
+
+goog.exportProperty(
+    olcs.FeatureConverter.prototype,
+    'createBillboardFromImage',
+    olcs.FeatureConverter.prototype.createBillboardFromImage);
 
 goog.exportProperty(
     olcs.FeatureConverter.prototype,
